@@ -1,47 +1,26 @@
+// src/types/server.ts
 export interface SystemInfo {
-  hostname: string
-  os: string
-  uptime: string
-  users: number
-  loadAverage: number[]
+  os: string;
+  cpu: string;
+  ram: number;
 }
 
-export interface HardwareInfo {
-  cpu: string
-  memory: {
-    total: number
-    used: number
-    free: number
-    available: number
-  }
-  disk: {
-    total: number
-    used: number
-    free: number
-    usedPercentage: number
-  }
+export interface DockerStats {
+  containers: number;
+  images: number;
+  volumes: number;
+}
+
+export interface NetworkInfo {
+  dockerNetworks: number;
+  vpnStatus: string;
+  proxyStatus: string;
 }
 
 export interface ServiceStatus {
-  name: string
-  status: 'healthy' | 'warning' | 'error'
-  uptime: string
-  memory: number
-  cpu: number
-}
-
-export interface DockerInfo {
-  version: string
-  containers: {
-    total: number
-    running: number
-    paused: number
-    stopped: number
-  }
-  images: number
-  volumes: {
-    total: number
-    named: number
-    unnamed: number
-  }
+  name: string;
+  status: 'healthy' | 'warning' | 'error';
+  uptime: string;
+  memory: number;
+  cpu: number;
 }
