@@ -1,4 +1,4 @@
-import { DockerStats, NetworkInfo, ServiceStatus, SystemInfo } from '@server-dashboard/types';
+import { DockerStats, NetworkInfo, ServiceStatus, SystemInfo } from '@/types/server';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
