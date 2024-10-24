@@ -1,3 +1,23 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+coverage/
+
 # Logs
 logs
 *.log
@@ -7,15 +27,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-.env*
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 .DS_Store
 *.suo
@@ -24,6 +39,47 @@ dist-ssr
 *.sln
 *.sw?
 
-# Python scripts
-bundle_project.py
-generate_tree.py
+# Vite
+*.local
+
+# Frontend specific
+apps/frontend/.vite/
+apps/frontend/dist/
+apps/frontend/coverage/
+
+# Backend specific
+apps/backend/dist/
+apps/backend/coverage/
+
+# Package specific
+packages/*/dist/
+packages/*/.turbo
+packages/*/coverage/
+
+# Temp files
+*.tmp
+*.temp
+.cache/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Debug
+.debug/
+*.debug
+
+# Local development
+*.dev
+*.local
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Misc
+.turbo
+.cache
+.next
+.nuxt
+.output

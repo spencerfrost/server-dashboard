@@ -1,7 +1,7 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useDockerStats, useNetworkInfo, useServiceStatus, useSystemInfo } from '@/lib/hooks/useServerData';
+import { useDockerStats, useNetworkInfo, useServiceStatus, useSystemInfo } from '@/hooks/useServerData';
 import { AlertCircle } from 'lucide-react';
 import React from 'react';
 
