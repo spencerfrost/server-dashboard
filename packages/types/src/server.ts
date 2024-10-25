@@ -19,8 +19,8 @@ export interface NetworkInfo {
 
 export interface ServiceStatus {
   name: string;
-  status: 'healthy' | 'warning' | 'error';
-  uptime: string;
-  memory: number;
+  uptime?: string;
   cpu: number;
+  memory: number;
+  status: "healthy" | "warning" | "error";
 }

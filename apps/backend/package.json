@@ -10,12 +10,16 @@
   },
   "dependencies": {
     "@server-dashboard/types": "workspace:*",
+    "connect-timeout": "^1.9.0",
     "cors": "^2.8.5",
+    "dockerode": "^4.0.2",
     "dotenv": "^16.4.1",
     "express": "^4.18.2"
   },
   "devDependencies": {
+    "@types/connect-timeout": "^0.0.39",
     "@types/cors": "^2.8.17",
+    "@types/dockerode": "^3.3.31",
     "@types/express": "^4.17.21",
     "@types/node": "^20.11.16",
     "ts-node-dev": "^2.0.0",

@@ -13,7 +13,10 @@ export interface Service {
     source: string
     target: string
   }>
-  dependencies?: string[]
+  dependencies?: string[],
+  memory?: number,
+  cpu?: number,
+  uptime?: string,
 }
 
 export interface ServiceLog {

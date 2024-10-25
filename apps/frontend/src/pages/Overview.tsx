@@ -1,12 +1,13 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useDockerStats, useNetworkInfo, useServiceStatus, useSystemInfo } from '@/hooks/useServerData';
+import { useDockerStats, useNetworkInfo, useServices, useSystemInfo } from '@/hooks/useServerData';
 import { AlertCircle } from 'lucide-react';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface StatusBadgeProps {
-  status: 'healthy' | 'warning' | 'error';
+  status: 'healthy' | 'warning' | 'error' | 'running' | 'stopped';
 }
 
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => (
@@ -49,34 +50,7 @@ const Overview: React.FC = () => {
   const systemInfo = useSystemInfo();
   const dockerStats = useDockerStats();
   const networkInfo = useNetworkInfo();
-  const serviceStatus = useServiceStatus();
-
-  const isLoading = systemInfo.isLoading || dockerStats.isLoading || networkInfo.isLoading || serviceStatus.isLoading;
-  const hasError = systemInfo.isError || dockerStats.isError || networkInfo.isError || serviceStatus.isError;
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold mb-6">System Overview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <LoadingCard />
-          <LoadingCard />
-          <LoadingCard />
-        </div>
-      </div>
-    );
-  }
-
-  if (hasError) {
-    return (
-      <div className="space-y-4">
-        {systemInfo.isError && <ErrorAlert message="Failed to load system information" />}
-        {dockerStats.isError && <ErrorAlert message="Failed to load Docker statistics" />}
-        {networkInfo.isError && <ErrorAlert message="Failed to load network information" />}
-        {serviceStatus.isError && <ErrorAlert message="Failed to load service status" />}
-      </div>
-    );
-  }
+  const serviceStatus = useServices('critical', 'status');
 
   return (
     <div className="space-y-6">
@@ -88,9 +62,17 @@ const Overview: React.FC = () => {
             <CardTitle className="text-gray-600">System</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p>{systemInfo.data?.os}</p>
-            <p>{systemInfo.data?.cpu}</p>
-            <p>{systemInfo.data?.ram}GB RAM</p>
+            {systemInfo.isLoading ? (
+              <LoadingCard />
+            ) : systemInfo.isError ? (
+              <ErrorAlert message="Failed to load system information" />
+            ) : (
+              <>
+                <p>{systemInfo.data?.os}</p>
+                <p>{systemInfo.data?.cpu}</p>
+                <p>{systemInfo.data?.ram}GB RAM</p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -99,9 +81,17 @@ const Overview: React.FC = () => {
             <CardTitle className="text-gray-600">Docker</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p>{dockerStats.data?.containers} Running Containers</p>
-            <p>{dockerStats.data?.images} Images</p>
-            <p>{dockerStats.data?.volumes} Named Volumes</p>
+            {dockerStats.isLoading ? (
+              <LoadingCard />
+            ) : dockerStats.isError ? (
+              <ErrorAlert message="Failed to load Docker statistics" />
+            ) : (
+              <>
+                <p>{dockerStats.data?.containers} Running Containers</p>
+                <p>{dockerStats.data?.images} Images</p>
+                <p>{dockerStats.data?.volumes} Named Volumes</p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -110,31 +100,70 @@ const Overview: React.FC = () => {
             <CardTitle className="text-gray-600">Network</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p>{networkInfo.data?.dockerNetworks} Docker Networks</p>
-            <p>{networkInfo.data?.vpnStatus}</p>
-            <p>{networkInfo.data?.proxyStatus}</p>
+            {networkInfo.isLoading ? (
+              <LoadingCard />
+            ) : networkInfo.isError ? (
+              <ErrorAlert message="Failed to load network information" />
+            ) : (
+              <>
+                <p>{networkInfo.data?.dockerNetworks} Docker Networks</p>
+                <p>{networkInfo.data?.vpnStatus}</p>
+                <p>{networkInfo.data?.proxyStatus}</p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Critical Services Status</CardTitle>
+          <Link 
+            to="/services" 
+            className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+          >
+            View All Services →
+          </Link>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {serviceStatus.data?.map((service) => (
-              <div key={service.name} className="flex items-center justify-between">
-                <span>{service.name}</span>
-                <StatusBadge status={service.status} />
-              </div>
-            ))}
-          </div>
+          {serviceStatus.isLoading ? (
+            <LoadingCard />
+          ) : serviceStatus.isError ? (
+            <ErrorAlert message="Failed to load service status" />
+          ) : (
+            <div className="space-y-3">
+              {serviceStatus.data?.map((service) => (
+                <div key={service.name} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <span>{service.name}</span>
+                    {service.uptime && (
+                      <span className="text-sm text-gray-500">
+                        Uptime: {service.uptime}
+                      </span>
+                    )}
+                    {service.cpu !== undefined && service.cpu > 0 && (
+                      <span className="text-sm text-gray-500">
+                        CPU: {service.cpu.toFixed(1)}%
+                      </span>
+                    )}
+                    {service.memory !== undefined && service.memory > 0 && (
+                      <span className="text-sm text-gray-500">
+                        Memory: {Math.round(service.memory)}MB
+                      </span>
+                    )}
+                  </div>
+                  <StatusBadge status={service.status} />
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
       <Alert>
-        <AlertDescription>Last documentation update: October 24, 2024 - Added new port management schema</AlertDescription>
+        <AlertDescription>
+          Last documentation update: October 24, 2024 - Added new port management schema
+        </AlertDescription>
       </Alert>
     </div>
   );

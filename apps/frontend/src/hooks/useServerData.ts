@@ -1,62 +1,44 @@
-import { DockerStats, NetworkInfo, ServiceStatus, SystemInfo } from '@server-dashboard/types';
-import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/api';
+import { DockerStats, NetworkInfo, Service, ServiceStatus, SystemInfo } from '@server-dashboard/types';
+import { UseQueryResult, useQuery } from '@tanstack/react-query';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
-// API functions
-async function fetchSystemInfo(): Promise<SystemInfo> {
-  const response = await fetch(`${API_BASE_URL}/api/system`);
-  if (!response.ok) throw new Error('Failed to fetch system info');
-  return response.json();
-}
-
-async function fetchDockerStats(): Promise<DockerStats> {
-  const response = await fetch(`${API_BASE_URL}/api/docker/stats`);
-  if (!response.ok) throw new Error('Failed to fetch docker stats');
-  return response.json();
-}
-
-async function fetchNetworkInfo(): Promise<NetworkInfo> {
-  const response = await fetch(`${API_BASE_URL}/api/network`);
-  if (!response.ok) throw new Error('Failed to fetch network info');
-  return response.json();
-}
-
-async function fetchServiceStatus(): Promise<ServiceStatus[]> {
-  const response = await fetch(`${API_BASE_URL}/api/services/status`);
-  if (!response.ok) throw new Error('Failed to fetch service status');
-  return response.json();
-}
-
-// Hooks
-export function useSystemInfo() {
-  return useQuery({
-    queryKey: ['systemInfo'],
-    queryFn: fetchSystemInfo,
-    refetchInterval: 60000, // 1 minute
+export function useServices(filter: 'all' | 'critical' | 'docker' | 'system', detail: 'full' | 'status'): UseQueryResult<(Service | ServiceStatus)[], Error> {
+  return useQuery<(Service | ServiceStatus)[], Error>({
+    queryKey: ['services', filter, detail],
+    queryFn: () => apiRequest<(Service | ServiceStatus)[]>(`/api/services?filter=${filter}&detail=${detail}`),
+    refetchInterval: 30000,
   });
 }
 
-export function useDockerStats() {
-  return useQuery({
-    queryKey: ['dockerStats'],
-    queryFn: fetchDockerStats,
-    refetchInterval: 30000, // 30 seconds
-  });
-}
-
-export function useNetworkInfo() {
-  return useQuery({
-    queryKey: ['networkInfo'],
-    queryFn: fetchNetworkInfo,
-    refetchInterval: 30000, // 30 seconds
-  });
-}
-
-export function useServiceStatus() {
-  return useQuery<ServiceStatus[]>({
+export function useServiceStatus(): UseQueryResult<ServiceStatus[], Error> {
+  return useQuery<ServiceStatus[], Error>({
     queryKey: ['serviceStatus'],
-    queryFn: fetchServiceStatus,
-    refetchInterval: 15000, // 15 seconds
-  });
+    queryFn: () => apiRequest<ServiceStatus[]>('/api/services/status'),
+    refetchInterval: 15000,
+  })
+}
+
+export function useSystemInfo(): UseQueryResult<SystemInfo, Error> {
+  return useQuery<SystemInfo, Error>({
+    queryKey: ['systemInfo'],
+    queryFn: () => apiRequest<SystemInfo>('/api/system'),
+    refetchInterval: 60000,
+  })
+}
+
+export function useDockerStats(): UseQueryResult<DockerStats, Error> {
+  return useQuery<DockerStats, Error>({
+    queryKey: ['dockerStats'],
+    queryFn: () => apiRequest<DockerStats>('/api/docker/stats'),
+    refetchInterval: 30000,
+  })
+}
+
+export function useNetworkInfo(): UseQueryResult<NetworkInfo, Error> {
+  return useQuery<NetworkInfo, Error>({
+    queryKey: ['networkInfo'],
+    queryFn: () => apiRequest<NetworkInfo>('/api/network'),
+    refetchInterval: 30000,
+  })
 }

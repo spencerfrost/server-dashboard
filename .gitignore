@@ -12,6 +12,9 @@ out/
 .env.*
 !.env.example
 
+# Bundled files
+project_bundle_*
+
 # TypeScript
 *.tsbuildinfo
 
