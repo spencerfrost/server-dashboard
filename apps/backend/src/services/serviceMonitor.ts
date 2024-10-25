@@ -6,7 +6,74 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 const docker = new Docker();
 
+interface ServiceCategory {
+  id: string;
+  name: string;
+  services: string[];
+}
+
+const SERVICE_CATEGORIES: ServiceCategory[] = [
+  {
+    id: 'web',
+    name: 'Web Services',
+    services: ['nginx', 'apache2']
+  },
+  {
+    id: 'database',
+    name: 'Databases',
+    services: ['postgresql', 'mariadb', 'mysql', 'redis-server']
+  },
+  {
+    id: 'network',
+    name: 'Networking',
+    services: ['NetworkManager', 'systemd-networkd', 'networkd-dispatcher', 'ssh', 'tailscaled', 'openvpn']
+  },
+  {
+    id: 'security',
+    name: 'Security',
+    services: ['ufw', 'apparmor', 'auditd', 'fail2ban', 'systemd-logind', 'polkit']
+  },
+  {
+    id: 'container',
+    name: 'Containerization',
+    services: ['docker', 'containerd', 'lxc']
+  },
+  {
+    id: 'storage',
+    name: 'Storage',
+    services: ['zfs-mount', 'zfs-share', 'zfs-volume-wait', 'zfs-zed']
+  },
+  {
+    id: 'core',
+    name: 'Core System',
+    services: ['cron', 'dbus', 'systemd-journald', 'systemd-resolved', 'systemd-timesyncd']
+  }
+];
+
 export class ServiceMonitor {
+  private getCategoryForService(serviceName: string): string {
+    // Remove common suffixes for matching
+    const cleanName = serviceName.replace(/\.(service|socket)$/, '');
+    
+    // Find matching category
+    for (const category of SERVICE_CATEGORIES) {
+      if (category.services.some(service => cleanName.includes(service))) {
+        return category.id;
+      }
+    }
+    
+    // Default categorization rules
+    if (cleanName.startsWith('systemd-')) {
+      return 'core';
+    }
+    
+    return 'other';
+  }
+
+  private getCategoryName(categoryId: string): string {
+    return SERVICE_CATEGORIES.find(cat => cat.id === categoryId)?.name || 'Other Services';
+  }
+
   async getServices(filter: 'all' | 'critical' | 'docker' | 'system', detail: 'full' | 'status'): Promise<(Service | ServiceStatus)[]> {
     try {
       let services: Service[] = [];
@@ -19,11 +86,20 @@ export class ServiceMonitor {
         services = services.concat(await this.getSystemServices(filter === 'critical'));
       }
 
+      // Add category information to services
+      const servicesWithCategories = services.map(service => ({
+        ...service,
+        category: {
+          id: this.getCategoryForService(service.name),
+          name: this.getCategoryName(this.getCategoryForService(service.name))
+        }
+      }));
+
       if (detail === 'status') {
-        return this.getServiceStatuses(services);
+        return this.getServiceStatuses(servicesWithCategories);
       }
 
-      return services;
+      return servicesWithCategories;
     } catch (error) {
       console.error('Error getting services:', error);
       return [];

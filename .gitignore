@@ -86,3 +86,7 @@ docker-compose.override.yml
 .next
 .nuxt
 .output
+
+# Python scripts
+bundle_project.py
+generate_tree.py
