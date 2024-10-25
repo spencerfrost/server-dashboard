@@ -15,6 +15,9 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: parseInt(env.VITE_PORT || '3001'),
+      hmr: {
+        port: parseInt(env.VITE_PORT || '3001'),
+      },
       proxy: {
         '/api': {
           target: env.VITE_API_URL,
