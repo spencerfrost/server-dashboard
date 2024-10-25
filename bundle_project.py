@@ -91,7 +91,6 @@ def create_flat_bundle():
     frontend_src_files = [
         ("apps/frontend/src/vite-env.d.ts", "frontend_src_vite-env.d.ts"),
         ("apps/frontend/src/main.tsx", "frontend_src_main.tsx"),
-        ("apps/frontend/src/App.css", "frontend_src_App.css"),
         ("apps/frontend/src/App.tsx", "frontend_src_App.tsx"),
         ("apps/frontend/src/index.css", "frontend_src_index.css")
     ]
