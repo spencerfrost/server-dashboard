@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sidebar"
 import {
   Activity,
+  Dock,
   File,
   HardDrive,
   Layers,
@@ -26,6 +27,7 @@ import { Link, useLocation } from 'react-router-dom'
 const menuItems = [
   { id: 'overview', label: 'Overview', icon: Layers, path: '/' },
   { id: 'services', label: 'Services', icon: Server, path: '/services' },
+  { id: 'docker', label: 'Docker', icon: Dock, path: '/docker' },
   { id: 'storage', label: 'Storage', icon: HardDrive, path: '/storage' },
   { id: 'network', label: 'Network', icon: Network, path: '/network' },
   { id: 'security', label: 'Security', icon: Shield, path: '/security' },

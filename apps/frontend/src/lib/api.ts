@@ -2,27 +2,35 @@ import { DockerStats, NetworkInfo, ServiceStatus, SystemInfo } from '@server-das
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3021';
 
-export async function apiRequest<T>(endpoint: string): Promise<T> {
+interface RequestOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  params?: Record<string, string | number>;
+  body?: unknown;
+}
+
+export async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const { method = 'GET', params, body } = options;
+    
+    // Add query parameters if they exist
+    const url = new URL(`${API_BASE_URL}${endpoint}`);
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.append(key, String(value));
+      });
+    }
+
+    const response = await fetch(url.toString(), {
+      method,
       headers: {
         'Content-Type': 'application/json',
       },
+      body: body ? JSON.stringify(body) : undefined,
       credentials: 'include',
-    });
-
-    console.debug('API_BASE_URL:', API_BASE_URL);
-
-    // Log response details for debugging
-    console.debug(`API Response for ${endpoint}:`, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries()),
     });
 
     // Handle 304 Not Modified - return the cached data
     if (response.status === 304) {
-      // React Query will handle the caching, just return null to use cached data
       return null as T;
     }
 
@@ -32,7 +40,6 @@ export async function apiRequest<T>(endpoint: string): Promise<T> {
     }
 
     const data = await response.json();
-    console.debug(`API Data for ${endpoint}:`, data);
     return data;
   } catch (error) {
     console.error(`API Error for ${endpoint}:`, error);

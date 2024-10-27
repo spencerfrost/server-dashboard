@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import DashboardLayout from './layouts/DashboardLayout'
 import Configuration from './pages/Configuration'
+import Docker from './pages/Docker'
 import Documentation from './pages/Documentation'
 import Monitoring from './pages/Monitoring'
 import Network from './pages/Network'
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Overview />} />
         <Route path="/services" element={<Services />} />
+        <Route path="/docker" element={<Docker />} />
         <Route path="/storage" element={<Storage />} />
         <Route path="/network" element={<Network />} />
         <Route path="/security" element={<Security />} />
