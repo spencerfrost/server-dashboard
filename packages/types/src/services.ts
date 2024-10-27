@@ -1,23 +1,25 @@
 export interface Service {
   id: string;
   name: string;
-  type: 'app' | 'system' | 'database' | 'monitoring';
-  status: 'running' | 'stopped' | 'error';
+  type: "system" | "app";
+  status: "running" | "stopped" | "error";
   portMapping: Array<{
     internal: number;
     external: number;
-    protocol: 'tcp' | 'udp';
+    protocol: "tcp" | "udp";
   }>;
-  env?: Record<string, string>;
-  volumes?: Array<{
-    source: string;
-    target: string;
-  }>;
-  dependencies?: string[];
-  memory?: number;
-  cpu?: number;
+  volumes: Array<{ source: string; target: string }>;
+  env: Record<string, string>;
+  dependencies: string[];
+  resources?: {
+    cpu: number;
+    memory: number;
+  };
   uptime?: string;
-  category?: ServiceCategory;
+  category?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface ServiceCategory {
@@ -27,7 +29,7 @@ export interface ServiceCategory {
 
 export interface ServiceStatus {
   name: string;
-  status: 'healthy' | 'warning' | 'error';
+  status: "healthy" | "warning" | "error";
   uptime?: string;
   memory?: number;
   cpu?: number;

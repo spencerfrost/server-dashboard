@@ -35,11 +35,6 @@ const Services = () => {
 
   // Filter and group services
   const allServices = (services || []).filter(isService)
-  
-  // Separate Docker services
-  const dockerServices = allServices
-    .filter(service => service.type === 'app')
-    .sort((a, b) => a.name.localeCompare(b.name))
 
   // Group system services by category
   const systemServices = allServices.filter(
@@ -63,22 +58,6 @@ const Services = () => {
       <h2 className="text-2xl font-bold">Services</h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-        <Card className="w-full lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Docker Services</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {dockerServices.length > 0 ? (
-              <ServiceTable 
-                services={dockerServices} 
-                showType={false} 
-              />
-            ) : (
-              <p className="text-sm text-gray-500">No Docker services running</p>
-            )}
-          </CardContent>
-        </Card>
-
         {Object.entries(groupedSystemServices)
           .sort(([, a], [, b]) => a.name.localeCompare(b.name))
           .map(([categoryId, category]) => (
@@ -89,7 +68,7 @@ const Services = () => {
               <CardContent>
                 <ServiceTable 
                   services={category.services.sort((a, b) => a.name.localeCompare(b.name))} 
-                  showType={false}
+                  showType={true}
                   compact={true}
                 />
               </CardContent>

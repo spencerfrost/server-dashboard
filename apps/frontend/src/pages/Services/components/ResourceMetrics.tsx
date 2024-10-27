@@ -1,18 +1,20 @@
-import { formatBytes } from '@/lib/utils'
-import React from 'react'
+import { formatBytes } from '@/lib/utils';
+import React from 'react';
 
 interface ResourceMetricsProps {
-  memory?: number
-  cpu?: number
+  resources?: {
+    memory?: number;
+    cpu?: number;
+  };
 }
 
-export const ResourceMetrics: React.FC<ResourceMetricsProps> = ({ memory, cpu }) => (
-  <div className="space-y-1 text-sm">
-    {typeof memory === 'number' && memory > 0 && (
-      <div>Memory: {formatBytes(memory)}</div>
-    )}
-    {typeof cpu === 'number' && cpu > 0 && (
-      <div>CPU: {cpu.toFixed(1)}%</div>
-    )}
-  </div>
-)
+export const ResourceMetrics: React.FC<ResourceMetricsProps> = ({ resources }) => {
+  const { memory, cpu } = resources || {};
+
+  return (
+    <div className="space-y-1 text-sm">
+      {memory !== undefined && <div>Memory: {formatBytes(memory)}</div>}
+      {cpu !== undefined && <div>CPU: {cpu.toFixed(1)}%</div>}
+    </div>
+  );
+};

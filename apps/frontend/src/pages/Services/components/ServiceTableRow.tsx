@@ -1,18 +1,15 @@
 import { TableCell, TableRow } from '@/components/ui/table'
+import { ResourceMetrics } from '@/pages/Services/components/ResourceMetrics'
+import { ServiceTypeIcon } from '@/pages/Services/components/ServiceTypeIcon'
 import { Service } from '@server-dashboard/types'
-import { ResourceMetrics } from './ResourceMetrics'
 import { ServiceStatusBadge } from './ServiceStatusBadge'
-import { ServiceTypeIcon } from './ServiceTypeIcon'
 
 interface ServiceTableRowProps {
   service: Service
   showType: boolean
 }
 
-export const ServiceTableRow: React.FC<ServiceTableRowProps> = ({ 
-  service, 
-  showType 
-}) => (
+export const ServiceTableRow: React.FC<ServiceTableRowProps> = ({ service, showType }) => (
   <TableRow>
     <TableCell className="py-2">
       <div className="font-medium">{service.name}</div>
@@ -21,10 +18,7 @@ export const ServiceTableRow: React.FC<ServiceTableRowProps> = ({
       <ServiceStatusBadge status={service.status} />
     </TableCell>
     <TableCell>
-      <ResourceMetrics 
-        memory={service.memory} 
-        cpu={service.cpu} 
-      />
+      <ResourceMetrics resources={service.resources} />
     </TableCell>
     <TableCell>
       <div className="text-sm">{service.uptime || 'N/A'}</div>
@@ -33,6 +27,6 @@ export const ServiceTableRow: React.FC<ServiceTableRowProps> = ({
       <TableCell>
         <ServiceTypeIcon type={service.type} />
       </TableCell>
-    )}
+    )} 
   </TableRow>
 )
